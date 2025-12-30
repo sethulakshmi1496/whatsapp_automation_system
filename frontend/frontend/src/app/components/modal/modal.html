@@ -1,0 +1,24 @@
+<div class="modal-overlay" *ngIf="isVisible" [class.show]="isVisible" (click)="onCancel()">
+    <div class="modal-container" (click)="$event.stopPropagation()" [class.show]="isVisible">
+        <!-- Icon -->
+        <div class="modal-icon" [style.background]="getIconColor()">
+            {{ getIcon() }}
+        </div>
+
+        <!-- Title -->
+        <h2 class="modal-title">{{ config?.title }}</h2>
+
+        <!-- Message -->
+        <p class="modal-message">{{ config?.message }}</p>
+
+        <!-- Buttons -->
+        <div class="modal-buttons">
+            <button *ngIf="config?.showCancel" class="modal-btn modal-btn-cancel" (click)="onCancel()">
+                {{ config?.cancelText || 'Cancel' }}
+            </button>
+            <button class="modal-btn modal-btn-confirm" [style.background]="getIconColor()" (click)="onConfirm()">
+                {{ config?.confirmText || 'OK' }}
+            </button>
+        </div>
+    </div>
+</div>

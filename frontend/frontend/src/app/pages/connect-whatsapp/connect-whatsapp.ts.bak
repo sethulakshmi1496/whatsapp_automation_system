@@ -1,0 +1,68 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SidebarComponent } from '../../components/sidebar/sidebar';
+import { HeaderComponent } from '../../components/header/header';
+import { SocketService } from '../../services/socket';
+import { WhatsappService } from '../../services/whatsapp';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-connect-whatsapp',
+  standalone: true,
+  imports: [CommonModule, SidebarComponent, HeaderComponent],
+  templateUrl: './connect-whatsapp.html',
+  styleUrl: './connect-whatsapp.css'
+})
+export class ConnectWhatsappComponent implements OnInit, OnDestroy {
+  qrCode: string | null = null;
+  status: string = 'disconnected';
+  statusMessage: string = 'Initializing...';
+  deviceInfo: any = null;
+
+  private qrSubscription?: Subscription;
+  private statusSubscription?: Subscription;
+
+  constructor(
+    private socketService: SocketService,
+    private whatsappService: WhatsappService
+  ) { }
+
+  ngOnInit() {
+    this.qrSubscription = this.socketService.onQr().subscribe(data => {
+      this.qrCode = data.qr;
+      if (data.qr) {
+        this.statusMessage = 'Scan QR code with your phone';
+      }
+    });
+
+    this.statusSubscription = this.socketService.onStatus().subscribe(data => {
+      this.status = data.status;
+      if (data.status === 'connected') {
+        this.statusMessage = 'Connected successfully!';
+        this.deviceInfo = data.user;
+        this.qrCode = null;
+      } else {
+        this.statusMessage = 'Disconnected';
+      }
+    });
+
+    this.whatsappService.getStatus().subscribe(data => {
+      this.status = data.status;
+    });
+  }
+
+  ngOnDestroy() {
+    this.qrSubscription?.unsubscribe();
+    this.statusSubscription?.unsubscribe();
+  }
+
+  disconnect() {
+    if (confirm('Are you sure you want to disconnect?')) {
+      this.whatsappService.disconnect().subscribe(() => {
+        this.status = 'disconnected';
+        this.deviceInfo = null;
+        this.statusMessage = 'Disconnected';
+      });
+    }
+  }
+}

@@ -1,0 +1,62 @@
+<!-- frontend/src/app/pages/connect-whatsapp/connect-whatsapp.html -->
+
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header></app-header>
+
+    <div class="content-area">
+      <div class="page-header">
+        <h2>Connect WhatsApp</h2>
+        <p>Scan QR code to connect your WhatsApp account</p>
+      </div>
+
+      <div class="connect-container">
+        <div class="status-banner" [class.connected]="status === 'connected'">
+          <div class="status-icon">{{ status === 'connected' ? '✅' : '⏳' }}</div>
+          <div class="status-text">{{ statusMessage }}</div>
+        </div>
+
+        <!-- show QR when qrCode exists -->
+        <div class="qr-section" *ngIf="qrCode">
+          <div class="qr-card">
+            <h3>Scan QR Code</h3>
+            <div class="qr-code-container">
+              <img [src]="qrCode" alt="QR Code" class="qr-image">
+            </div>
+            <div class="qr-instructions">
+              <p><strong>How to connect:</strong></p>
+              <ol>
+                <li>Open WhatsApp on your phone</li>
+                <li>Tap Menu or Settings and select Linked Devices</li>
+                <li>Tap on Link a Device</li>
+                <li>Point your phone to this screen to capture the code</li>
+              </ol>
+              <button class="secondary-btn" (click)="reloadQr()" style="margin-top: 1rem; width: 100%;">Generate New
+                QR</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="connected-section" *ngIf="status === 'connected' && deviceInfo">
+          <div class="success-card">
+            <div class="success-icon">🎉</div>
+            <h3>Successfully Connected!</h3>
+            <div class="device-info">
+              <p><strong>Device:</strong> {{ deviceInfo.name || 'WhatsApp' }}</p>
+              <p><strong>Number:</strong> {{ deviceInfo.id?.split(':')[0] || 'Connected' }}</p>
+            </div>
+            <button class="disconnect-btn" (click)="disconnect()">Disconnect</button>
+          </div>
+        </div>
+
+        <div class="waiting-section" *ngIf="!qrCode && status !== 'connected'">
+          <div class="loading-spinner"></div>
+          <p>Initializing WhatsApp connection...</p>
+          <button class="secondary-btn" (click)="reloadQr()" style="margin-top: 1rem;">Reload QR Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

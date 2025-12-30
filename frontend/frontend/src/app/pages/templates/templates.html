@@ -1,0 +1,92 @@
+<div class="dashboard-layout">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+        <app-header></app-header>
+
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h2>Message Templates</h2>
+                    <p>Create and manage message templates with variables</p>
+                </div>
+                <button class="btn btn-primary" (click)="openModal()">➕ Add Template</button>
+            </div>
+
+            <div class="templates-grid">
+                <div *ngFor="let template of templates" class="template-card">
+                    <div class="template-header">
+                        <h3>{{ template.title }}</h3>
+                        <div class="template-actions">
+                            <button class="action-btn" (click)="openModal(template)">✏️</button>
+                            <button class="action-btn" (click)="deleteTemplate(template.id)">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="template-body">
+                        {{ template.body }}
+                    </div>
+                    <div class="template-footer" *ngIf="template.media_url">
+                        <span class="media-badge">📎 Has Media</span>
+                    </div>
+                </div>
+
+                <div *ngIf="templates.length === 0" class="no-templates">
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>No templates yet</h3>
+                        <p>Create your first message template to get started</p>
+                        <button class="btn btn-primary" (click)="openModal()">Create Template</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ editingTemplate ? 'Edit Template' : 'Create Template' }}</h3>
+            <button class="close-btn" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label>Template Title *</label>
+                        <input type="text" [(ngModel)]="formData.title" placeholder="e.g., Welcome Message">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" [(ngModel)]="formData.category"
+                            placeholder="e.g., Welcome, Promotional, Follow-up">
+                        <small>Optional: Organize templates by category</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Message Body *</label>
+                        <textarea [(ngModel)]="formData.body" (input)="updatePreview()"
+                            placeholder="Hello {{'{{name}'}}, your order is ready!" rows="6"></textarea>
+                        <small>Use {{'{{name}}'}} and {{'{{phone}}'}} as variables</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Media URL (optional)</label>
+                        <input type="text" [(ngModel)]="formData.media_url" placeholder="https://example.com/image.jpg">
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="preview-section">
+                        <h4>Preview</h4>
+                        <div class="preview-box">
+                            {{ previewBody || 'Preview will appear here...' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button class="btn btn-primary" (click)="saveTemplate()">Save Template</button>
+        </div>
+    </div>
+</div>

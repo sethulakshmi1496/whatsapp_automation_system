@@ -1,0 +1,20 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>📱 WhatsApp</h2>
+        <p>Automation</p>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div *ngFor="let item of menuItems" class="nav-item" [class.active]="isActive(item.route)"
+            (click)="navigate(item.route)">
+            <span class="nav-icon">{{item.icon}}</span>
+            <span class="nav-label">{{item.label}}</span>
+        </div>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button class="logout-btn" (click)="logout()">
+            <span>🚪</span> Logout
+        </button>
+    </div>
+</div>

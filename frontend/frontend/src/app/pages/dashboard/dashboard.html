@@ -1,0 +1,71 @@
+<div class="dashboard-layout">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+        <app-header></app-header>
+
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h2>Dashboard</h2>
+                    <p>Welcome to your Demo App Dashboard</p>
+                </div>
+                <button (click)="connectGoogleContacts()" class="google-connect-btn">
+                    <span class="icon">🔗</span> Connect Google Contacts
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value">{{ stats.customers }}</div>
+                        <div class="stat-label">Total Customers</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-info">
+                        <div class="stat-value">{{ stats.messages }}</div>
+                        <div class="stat-label">Messages</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value">{{ stats.messagesSent }}</div>
+                        <div class="stat-label">Messages Sent</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-info">
+                        <div class="stat-value">{{ stats.messagesQueued }}</div>
+                        <div class="stat-label">Queued Messages</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <h3>Recent Activity</h3>
+                <div class="activity-list">
+                    <div *ngFor="let log of recentLogs" class="activity-item">
+                        <div class="activity-status" [class]="log.status">
+                            {{ log.status }}
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-phone">{{ log.to_phone }}</div>
+                            <div class="activity-time">{{ log.createdAt | date:'short' }}</div>
+                        </div>
+                    </div>
+                    <div *ngIf="recentLogs.length === 0" class="no-activity">
+                        No recent activity
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

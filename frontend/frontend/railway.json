@@ -1,0 +1,11 @@
+{
+    "$schema": "https://railway.app/railway.schema.json",
+    "build": {
+        "builder": "NIXPACKS",
+        "buildCommand": "npm install && npm run build"
+    },
+    "deploy": {
+        "startCommand": "npx http-server dist/whatsapp-frontend/browser -p $PORT",
+        "restartPolicyType": "ON_FAILURE"
+    }
+}

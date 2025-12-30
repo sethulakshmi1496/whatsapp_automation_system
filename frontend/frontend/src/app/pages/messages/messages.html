@@ -1,0 +1,108 @@
+<div class="dashboard-layout">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+        <app-header></app-header>
+
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h2>Message Categories</h2>
+                    <p>Manage messages organized by category for randomized sending</p>
+                </div>
+                <button class="btn btn-primary" (click)="openModal()">➕ Add Message</button>
+            </div>
+
+            <div class="categories-container">
+                <div *ngFor="let categoryGroup of categoryGroups" class="category-group">
+                    <div class="category-header" (click)="toggleCategory(categoryGroup)">
+                        <div class="category-title">
+                            <span class="expand-icon">{{ categoryGroup.isExpanded ? '▼' : '▶' }}</span>
+                            <h3>{{ categoryGroup.name }}</h3>
+                            <span class="message-count">{{ categoryGroup.messages.length }} messages</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="categoryGroup.isExpanded" class="messages-grid">
+                        <div *ngFor="let message of categoryGroup.messages" class="message-card">
+                            <div class="message-header">
+                                <div>
+                                    <h4>{{ message.title }}</h4>
+                                    <span class="source-badge" [class.template]="message.source === 'template'">
+                                        {{ message.source === 'template' ? 'Template' : 'Message' }}
+                                    </span>
+                                </div>
+                                <div class="message-actions">
+                                    <button class="action-btn" (click)="openModal(message)">✏️</button>
+                                    <button class="action-btn" (click)="deleteMessage(message)">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="message-body">
+                                {{ message.body }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="categoryGroups.length === 0" class="no-messages">
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>No messages yet</h3>
+                        <p>Create your first message to get started</p>
+                        <button class="btn btn-primary" (click)="openModal()">Create Message</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ editingMessage ? 'Edit Message' : 'Create Message' }}</h3>
+            <button class="close-btn" (click)="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-column">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <input type="text" [(ngModel)]="formData.category"
+                            placeholder="e.g., Welcome, Thank You, orders, offers"
+                            [disabled]="editingMessage && editingMessage.source === 'message_category'">
+                        <small>Group messages by category for randomized sending</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Message Title *</label>
+                        <input type="text" [(ngModel)]="formData.title" placeholder="e.g., Welcome Message">
+                    </div>
+                    <div class="form-group">
+                        <label>Message Body *</label>
+                        <textarea [(ngModel)]="formData.body" (input)="updatePreview()"
+                            placeholder="Hello {{'{{name}'}}, welcome to our service!" rows="6"></textarea>
+                        <small>Use {{'{{name}}'}} and {{'{{phone}}'}} as variables</small>
+                    </div>
+                </div>
+                <div class="form-column">
+                    <div class="preview-section">
+                        <h4>Preview</h4>
+                        <div class="preview-box">
+                            {{ previewBody || 'Preview will appear here...' }}
+                        </div>
+                        <div class="info-box">
+                            <strong>ℹ️ How it works:</strong>
+                            <p>Messages in the same category will be shuffled and sent randomly to different customers
+                                with 10-30 second delays.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button class="btn btn-primary" (click)="saveMessage()">Save Message</button>
+        </div>
+    </div>
+</div>

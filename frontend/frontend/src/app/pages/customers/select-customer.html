@@ -1,0 +1,27 @@
+<!-- frontend/src/app/pages/customers/select-customer.html -->
+<div class="select-customer">
+  <h3>Select Customer</h3>
+
+  <div *ngIf="loading">Loading customers…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <ul *ngIf="!loading && customers.length">
+    <li *ngFor="let c of customers" (click)="selectCustomer(c)" 
+        [class.selected]="selectedCustomer?.id === c.id">
+      <strong>{{ c.name }}</strong> — {{ c.phone }}
+    </li>
+  </ul>
+
+  <div *ngIf="!loading && !customers.length">
+    No customers found.
+  </div>
+
+  <div *ngIf="selectedCustomer" class="msg-panel">
+    <h4>Send message to {{ selectedCustomer.name }}</h4>
+    <textarea [(ngModel)]="messageText" rows="4"></textarea>
+    <br />
+    <button (click)="sendMessage()" [disabled]="sending">
+      {{ sending ? 'Sending…' : 'Send' }}
+    </button>
+  </div>
+</div>

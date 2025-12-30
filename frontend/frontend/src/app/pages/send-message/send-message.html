@@ -1,0 +1,123 @@
+<div class="dashboard-layout">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+        <app-header></app-header>
+
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h2>Send Message</h2>
+                    <p>Send messages to single or multiple customers</p>
+                </div>
+            </div>
+
+            <div class="send-grid">
+                <div class="left-panel">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3>Select Customers</h3>
+                            <button class="link-btn" (click)="selectAllCustomers()">
+                                {{ selectedCustomers.length === customers.length ? 'Deselect All' : 'Select All' }}
+                            </button>
+                        </div>
+
+                        <!-- Risk Assessment (based on selected count) -->
+                        <div class="risk-assessment"
+                            [style.background]="getRiskLevel() === 'low' ? '#ecfdf5' : getRiskLevel() === 'medium' ? '#fef3c7' : getRiskLevel() === 'high' ? '#fee2e2' : '#fef2f2'"
+                            [style.border-color]="getRiskColor()">
+                            <div class="risk-header">
+                                <span class="risk-icon" [style.background]="getRiskColor()">
+                                    {{ getRiskIcon() }}
+                                </span>
+                                <span class="risk-level" [style.color]="getRiskColor()">
+                                    {{ getRiskLevel() === 'blocked' ? 'LIMIT REACHED' : getRiskLevel().toUpperCase() + '
+                                    RISK' }}
+                                </span>
+                            </div>
+                            <p class="risk-message">{{ getRiskMessage() }}</p>
+                        </div>
+
+                        <div class="customer-list">
+                            <div *ngFor="let customer of customers" class="customer-item"
+                                [class.selected]="selectedCustomers.includes(customer.id)"
+                                [class.disabled]="selectedCustomers.length >= 3 && !selectedCustomers.includes(customer.id)"
+                                (click)="toggleCustomer(customer.id)">
+                                <div class="checkbox">
+                                    <span *ngIf="selectedCustomers.includes(customer.id)">✓</span>
+                                </div>
+                                <div class="customer-info">
+                                    <div class="customer-name">{{ customer.name }}</div>
+                                    <div class="customer-phone">{{ customer.phone }}</div>
+                                </div>
+                            </div>
+                            <div *ngIf="customers.length === 0" class="no-customers">
+                                No customers available. Add customers first.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="section-card">
+                        <h3>Compose Message</h3>
+
+                        <div class="form-group">
+                            <label>Message Type</label>
+                            <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+                                <option [ngValue]="null">-- Custom/Template Message --</option>
+                                <option *ngFor="let cat of categories; trackBy: trackByCategory" [ngValue]="cat">
+                                    {{ cat }} (Randomized)
+                                </option>
+                            </select>
+                            <small *ngIf="selectedCategory" style="color: #666; display: block; margin-top: 5px;">
+                                📌 Each customer will receive a unique message from this category with 10-30 second
+                                delays
+                            </small>
+                        </div>
+
+                        <div class="form-group" *ngIf="!selectedCategory">
+                            <label>Select Template (optional)</label>
+                            <select [(ngModel)]="selectedTemplate" (change)="onTemplateChange()">
+                                <option [ngValue]="null">-- Custom Message --</option>
+                                <option *ngFor="let template of templates; trackBy: trackByTemplateId"
+                                    [ngValue]="template.id">
+                                    {{ template.title }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" *ngIf="!selectedCategory">
+                            <label>Message</label>
+                            <textarea [(ngModel)]="customMessage" (input)="updatePreview()"
+                                placeholder="Type your message here... Use {{'{{name}}'}} and {{'{{phone}}'}} as variables"
+                                rows="6"></textarea>
+                        </div>
+
+                        <div class="preview-section">
+                            <h4>Preview</h4>
+                            <div class="preview-box">
+                                {{ messagePreview || 'Preview will appear here...' }}
+                            </div>
+                        </div>
+
+                        <div class="send-info">
+                            <div class="info-item">
+                                <span class="info-label">Recipients:</span>
+                                <span class="info-value">
+                                    {{ selectedCustomers.length }}
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <button class="btn btn-primary btn-large" (click)="sendMessage()"
+                            [disabled]="sending || !canSendMessages() || (!selectedCategory && !customMessage)">
+                            {{ sending ? 'Sending...' : 'Send Message' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

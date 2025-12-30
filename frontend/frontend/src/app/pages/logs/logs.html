@@ -1,0 +1,74 @@
+<div class="dashboard-layout">
+    <app-sidebar></app-sidebar>
+
+    <div class="main-content">
+        <app-header></app-header>
+
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h2>Message Logs</h2>
+                    <p>Track all sent and queued messages</p>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-value">{{ stats.total }}</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-box success">
+                    <div class="stat-value">{{ stats.sent }}</div>
+                    <div class="stat-label">Sent</div>
+                </div>
+                <div class="stat-box warning">
+                    <div class="stat-value">{{ stats.queued }}</div>
+                    <div class="stat-label">Queued</div>
+                </div>
+                <div class="stat-box danger">
+                    <div class="stat-value">{{ stats.failed }}</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+            </div>
+
+            <div class="filters-bar">
+                <input type="text" [(ngModel)]="searchTerm" (input)="onFilterChange()"
+                    placeholder="Search by phone or message...">
+
+                <select [(ngModel)]="filterStatus" (change)="onFilterChange()">
+                    <option value="all">All Status</option>
+                    <option value="sent">Sent</option>
+                    <option value="queued">Queued</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+
+            <div class="logs-container">
+                <div *ngFor="let log of filteredLogs" class="log-item" [class]="getStatusClass(log.status)">
+                    <div class="log-icon">{{ getStatusIcon(log.status) }}</div>
+                    <div class="log-content">
+                        <div class="log-header">
+                            <span class="log-phone">{{ log.to_phone }}</span>
+                            <span class="log-status" [class]="log.status">{{ log.status }}</span>
+                        </div>
+                        <div class="log-body">{{ log.body }}</div>
+                        <div class="log-footer">
+                            <span class="log-time">{{ log.createdAt | date:'medium' }}</span>
+                            <span class="log-attempts" *ngIf="log.attempts > 0">Attempts: {{ log.attempts }}</span>
+                        </div>
+                        <div class="log-error" *ngIf="log.error">
+                            Error: {{ log.error }}
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="filteredLogs.length === 0" class="no-logs">
+                    <div class="empty-icon">📋</div>
+                    <h3>No logs found</h3>
+                    <p>{{ searchTerm || filterStatus !== 'all' ? 'Try adjusting your filters' : 'Start sending messages
+                        to see logs here' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

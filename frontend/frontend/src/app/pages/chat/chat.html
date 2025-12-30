@@ -1,0 +1,94 @@
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header title="Chat"></app-header>
+
+    <div class="chat-container">
+      <!-- Left Sidebar: Conversations -->
+      <div class="conversations-list">
+        <div class="search-bar">
+          <input type="text" placeholder="Search chats..." [(ngModel)]="searchTerm">
+        </div>
+
+        <div class="list-items">
+          <div *ngFor="let chat of filteredConversations" class="conversation-item"
+            [class.active]="selectedChat?.phone === chat.phone" (click)="selectChat(chat)">
+            <div class="avatar">
+              {{ chat.name.charAt(0).toUpperCase() }}
+            </div>
+            <div class="details">
+              <div class="top-row">
+                <span class="name">{{ chat.name }}</span>
+                <span class="time" *ngIf="chat.lastMessage">{{ chat.lastMessage.timestamp | date:'shortTime' }}</span>
+              </div>
+              <div class="bottom-row">
+                <span class="preview">
+                  <span *ngIf="chat.lastMessage?.from_me">You: </span>
+                  {{ chat.lastMessage?.body || 'No messages yet' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="filteredConversations.length === 0" class="no-results">
+            No conversations found
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Chat Area -->
+      <div class="chat-area" *ngIf="selectedChat; else noChatSelected">
+        <div class="chat-header">
+          <div class="avatar-small">{{ selectedChat.name.charAt(0).toUpperCase() }}</div>
+          <div class="header-info">
+            <h3>{{ selectedChat.name }}</h3>
+            <span class="phone">{{ selectedChat.phone }}</span>
+          </div>
+        </div>
+
+        <div class="messages-container" #scrollMe>
+          <ng-container *ngFor="let item of groupedMessages; let i = index">
+            <!-- Date Separator -->
+            <ng-container *ngIf="item.type === 'date-separator'">
+              <div class="date-separator">
+                <span>{{ item.date }}</span>
+              </div>
+            </ng-container>
+
+            <!-- Message Bubble -->
+            <ng-container *ngIf="item.type === 'message'">
+              <div class="message-bubble" [class.sent]="item.from_me" [class.received]="!item.from_me">
+                <div class="message-content">
+                  {{ item.body }}
+                </div>
+                <div class="message-time">
+                  {{ item.timestamp | date:'shortTime' }}
+                  <span *ngIf="item.from_me" class="status-icon">
+                    {{ item.status === 'read' ? '✓✓' : (item.status === 'delivered' ? '✓✓' : '✓') }}
+                  </span>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+
+        <div class="input-area">
+          <input type="text" placeholder="Type a message..." [(ngModel)]="newMessage" (keyup.enter)="sendMessage()">
+          <button (click)="sendMessage()" [disabled]="!newMessage.trim() || sending">
+            <span *ngIf="!sending">➤</span>
+            <span *ngIf="sending">...</span>
+          </button>
+        </div>
+      </div>
+
+      <ng-template #noChatSelected>
+        <div class="no-chat-selected">
+          <div class="placeholder-icon">💬</div>
+          <h2>Select a conversation</h2>
+          <p>Choose a customer from the list to start chatting</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
