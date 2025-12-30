@@ -2,35 +2,31 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const router = inject(Router);
     const token = localStorage.getItem('token');
 
-    console.log('[AuthInterceptor] Request:', req.url, 'Has token:', !!token);
-
-    if (token) {
-        const cloned = req.clone({
-            setHeaders: { Authorization: `Bearer ${token}` }
-        });
-
-        return next(cloned).pipe(
-            catchError((error) => {
-                if (error.status === 401) {
-                    console.error('[AuthInterceptor] 401 Unauthorized - redirecting to login');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    router.navigate(['/login']);
-                }
-                return throwError(() => error);
-            })
-        );
+    // Prepend base URL for API requests
+    let url = req.url;
+    if (url.startsWith('/api')) {
+        url = environment.apiUrl.replace('/api', '') + url;
     }
 
-    return next(req).pipe(
+    console.log('[AuthInterceptor] Request:', url, 'Has token:', !!token);
+
+    const clonedReq = req.clone({
+        url: url,
+        setHeaders: token ? { Authorization: `Bearer ${token}` } : {}
+    });
+
+    return next(clonedReq).pipe(
         catchError((error) => {
             if (error.status === 401) {
-                console.error('[AuthInterceptor] 401 Unauthorized (no token) - redirecting to login');
+                console.error('[AuthInterceptor] 401 Unauthorized - redirecting to login');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 router.navigate(['/login']);
             }
             return throwError(() => error);
