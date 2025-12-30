@@ -13,12 +13,18 @@ const authMiddleware = require('./src/middleware/authMiddleware');
 
 const server = http.createServer(app);
 
-// socket.io
+// socket.io with Render-friendly configuration
 const io = new Server(server, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],
+    credentials: true
   },
+  transports: ['polling', 'websocket'], // Try polling first, then upgrade to websocket
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  upgradeTimeout: 30000,
+  allowUpgrades: true
 });
 
 app.use(bodyParser.json({ limit: '1mb' }));
